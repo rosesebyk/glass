@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1322,5 +1323,498 @@
     if (e.target === this) this.classList.remove('open');
   });
 </script>
+=======
+!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prem Hackathon Demo — Smart Delivery Risk & Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #10131a;
+      --muted: #5c6372;
+      --bg: #f7f2ec;
+      --accent: #ff7a59;
+      --accent-2: #1f9d8b;
+      --accent-3: #2a2f6b;
+      --card: #ffffff;
+      --shadow: 0 20px 60px rgba(16, 19, 26, 0.12);
+      --radius: 20px;
+      --grid-gap: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 10% -10%, #ffe7dc 0%, transparent 55%),
+                  radial-gradient(1200px 600px at 90% 0%, #dff3ef 0%, transparent 50%),
+                  var(--bg);
+      color: var(--ink);
+      font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #ffb26b);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(255, 122, 89, 0.35);
+    }
+
+    .nav .tag {
+      font-size: 14px;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(16, 19, 26, 0.1);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 36px;
+      align-items: center;
+      margin-bottom: 56px;
+    }
+
+    .hero h1 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(36px, 4vw, 56px);
+      margin: 0 0 16px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      margin: 0 0 24px;
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent-3);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(42, 47, 107, 0.2);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      border: 1px solid rgba(16, 19, 26, 0.1);
+      color: var(--ink);
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .hero-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 122, 89, 0.3), transparent 70%);
+    }
+
+    .risk-meter {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .meter {
+      height: 10px;
+      background: #f0f1f5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter span {
+      display: block;
+      height: 100%;
+      width: 68%;
+      background: linear-gradient(90deg, var(--accent), #ffb26b);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(31, 157, 139, 0.12);
+      color: var(--accent-2);
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--grid-gap);
+    }
+
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    .card h3 { margin: 0; }
+    .card p { margin: 0; color: var(--muted); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .step {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px dashed rgba(16, 19, 26, 0.15);
+      min-height: 120px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .step span {
+      font-weight: 700;
+      color: var(--accent-3);
+    }
+
+    .cta {
+      margin-top: 56px;
+      background: linear-gradient(135deg, #1f9d8b, #2a2f6b);
+      color: #fff;
+      padding: 32px;
+      border-radius: 28px;
+      display: grid;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .cta .btn-secondary { border-color: rgba(255, 255, 255, 0.4); color: #fff; background: transparent; }
+
+    .footer {
+      margin-top: 48px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .flow { grid-template-columns: 1fr; }
+      .nav { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-badge">P</div>
+        <div>
+          Prem Delivery AI
+          <div class="tag">Hackathon Demo</div>
+        </div>
+      </div>
+      <div class="pill">Live: Risk Score + GatePass</div>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <div class="section-title">Smart Delivery Intelligence</div>
+        <h1>Predict delivery risk, unlock gated entry, and guide every driver in real time.</h1>
+        <p>
+          An AI layer that flags high‑risk drops before dispatch, pre‑approves QR GatePass access, and
+          recommends the right action so first‑attempt success stays high without changing existing workflows.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="start-demo">Start Demo</button>
+          <button class="btn btn-secondary" id="driver-view">See Driver View</button>
+        </div>
+      </div>
+      <div class="hero-card reveal">
+        <div class="section-title">Dispatch Preview</div>
+        <h3>Delivery Risk Score: <span id="risk-score">82</span></h3>
+        <div class="meter"><span id="risk-meter"></span></div>
+        <div class="risk-meter">
+          <div class="pill" id="pill-action">High Risk • Call Customer</div>
+          <div class="pill" id="pill-time" style="background: rgba(42,47,107,0.12); color: var(--accent-3);">Suggest: 6:30–7:15 PM</div>
+          <div class="pill" id="pill-gate" style="background: rgba(255,122,89,0.12); color: var(--accent);">Generate QR GatePass</div>
+        </div>
+        <div style="margin-top: 14px; font-size: 13px; color: var(--muted); font-weight: 600;">Session Log</div>
+        <div id="demo-log" style="display: grid; gap: 8px; margin-top: 8px;"></div>
+        <div id="demo-status" style="margin-top: 16px; color: var(--muted); font-size: 14px;">Ready for demo.</div>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="section-title">Core Capabilities</div>
+      <div class="grid">
+        <div class="card">
+          <h3>Proactive Risk Prediction</h3>
+          <p>Calculates a delivery risk score before dispatch and surfaces preventive actions for drivers.</p>
+        </div>
+        <div class="card">
+          <h3>QR GatePass System</h3>
+          <p>Pre‑approved entry for gated communities reduces wait time and increases first‑attempt success.</p>
+        </div>
+        <div class="card">
+          <h3>AI‑Powered Delivery Advice</h3>
+          <p>Recommends optimal timing, whether to call, or when to auto‑generate a GatePass.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal" style="margin-top: 48px;">
+      <div class="section-title">How It Works</div>
+      <div class="flow">
+        <div class="step">
+          <span>1. Score</span>
+          <div>Risk model evaluates package, location, and history before dispatch.</div>
+        </div>
+        <div class="step">
+          <span>2. Advise</span>
+          <div>AI suggests best delivery window or a customer call.</div>
+        </div>
+        <div class="step">
+          <span>3. GatePass</span>
+          <div>QR access is generated for verified gated communities.</div>
+        </div>
+        <div class="step">
+          <span>4. Deliver</span>
+          <div>Security validates quickly, driver completes drop on first attempt.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta reveal">
+      <h2 style="margin: 0; font-family: 'Fraunces', serif;">No disruption. Just smarter delivery outcomes.</h2>
+      <div>Tracking stays live, security still validates, and drivers get better guidance instantly.</div>
+      <div class="cta-actions">
+        <button class="btn btn-primary" id="run-demo" style="background: #fff; color: var(--accent-3);">Run Demo Scenario</button>
+        <button class="btn btn-secondary" id="download-pdf">Download Pitch PDF</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Built for Prem Hackathon • Delivery Risk + GatePass • Example site
+    </footer>
+  </div>
+
+  <script>
+    const revealElements = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.2 });
+
+    revealElements.forEach(el => observer.observe(el));
+
+    const demoSteps = [
+      {
+        score: 82,
+        meter: 82,
+        action: "High Risk • Call Customer",
+        time: "Suggest: 6:30–7:15 PM",
+        gate: "Generate QR GatePass",
+        status: "Risk flagged. Driver notified to call customer."
+      },
+      {
+        score: 58,
+        meter: 58,
+        action: "Medium Risk • Confirm Address",
+        time: "Suggest: 4:30–5:10 PM",
+        gate: "GatePass Optional",
+        status: "Address confirmed. Timing adjusted."
+      },
+      {
+        score: 33,
+        meter: 33,
+        action: "Low Risk • Proceed",
+        time: "Suggest: 2:00–2:45 PM",
+        gate: "Auto‑issue GatePass",
+        status: "GatePass issued. Security pre‑verified."
+      },
+      {
+        score: 12,
+        meter: 12,
+        action: "Very Low Risk • Deliver",
+        time: "Deliver Now",
+        gate: "GatePass Active",
+        status: "Delivery completed on first attempt."
+      }
+    ];
+
+    const riskScoreEl = document.getElementById('risk-score');
+    const meterEl = document.getElementById('risk-meter');
+    const pillAction = document.getElementById('pill-action');
+    const pillTime = document.getElementById('pill-time');
+    const pillGate = document.getElementById('pill-gate');
+    const demoStatus = document.getElementById('demo-status');
+    const demoLog = document.getElementById('demo-log');
+    const startBtn = document.getElementById('start-demo');
+    const runBtn = document.getElementById('run-demo');
+    const driverBtn = document.getElementById('driver-view');
+    const pdfBtn = document.getElementById('download-pdf');
+
+    let demoTimer = null;
+    let stepIndex = 0;
+
+    function applyStep(step) {
+      riskScoreEl.textContent = step.score;
+      meterEl.style.width = `${step.meter}%`;
+      pillAction.textContent = step.action;
+      pillTime.textContent = step.time;
+      pillGate.textContent = step.gate;
+      demoStatus.textContent = step.status;
+      const logItem = document.createElement('div');
+      logItem.style.padding = '10px 12px';
+      logItem.style.borderRadius = '12px';
+      logItem.style.background = 'rgba(16, 19, 26, 0.04)';
+      logItem.textContent = step.status;
+      demoLog.prepend(logItem);
+      if (demoLog.children.length > 4) {
+        demoLog.removeChild(demoLog.lastChild);
+      }
+    }
+
+    function runDemo() {
+      if (demoTimer) {
+        clearInterval(demoTimer);
+        demoTimer = null;
+      }
+      demoLog.innerHTML = '';
+      stepIndex = 0;
+      applyStep(demoSteps[stepIndex]);
+      demoStatus.textContent = "Demo running...";
+      startBtn.disabled = true;
+      runBtn.disabled = true;
+      startBtn.style.opacity = '0.7';
+      runBtn.style.opacity = '0.7';
+      document.querySelector('.hero-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      demoTimer = setInterval(() => {
+        stepIndex += 1;
+        if (stepIndex >= demoSteps.length) {
+          clearInterval(demoTimer);
+          demoTimer = null;
+          demoStatus.textContent = "Demo complete. Ready to run again.";
+          startBtn.disabled = false;
+          runBtn.disabled = false;
+          startBtn.style.opacity = '1';
+          runBtn.style.opacity = '1';
+          return;
+        }
+        applyStep(demoSteps[stepIndex]);
+      }, 1800);
+    }
+
+    startBtn.addEventListener('click', runDemo);
+    runBtn.addEventListener('click', runDemo);
+
+    driverBtn.addEventListener('click', () => {
+      demoStatus.textContent = "Driver view: alerts, call buttons, and QR scan ready.";
+    });
+
+    pdfBtn.addEventListener('click', () => {
+      demoStatus.textContent = "Pitch PDF download not connected in this demo.";
+    });
+
+    applyStep(demoSteps[0]);
+  </script>
+>>>>>>> bb2ea85b48d28609088c2f6720d3b40a1e5df13b
 </body>
 </html>
