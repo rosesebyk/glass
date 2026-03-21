@@ -1,6 +1,6 @@
-# Prem Delivery AI
+# GATEPASS AI
 
-Prem Delivery AI is a lightweight hackathon demo for smarter last-mile delivery.
+GATEPASS AI is a lightweight hackathon demo for smarter last-mile delivery.
 
 It showcases:
 
