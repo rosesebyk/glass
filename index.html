@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GatePass AI — Delivery Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0A0C0F;
+    --ink-2: #1A1D22;
+    --ink-3: #252930;
+    --wire: #2E323A;
+    --wire-2: #3D424D;
+    --muted: #6B7280;
+    --dim: #9CA3AF;
+    --paper: #F4F3EF;
+    --cream: #FAFAF8;
+    --white: #FFFFFF;
+
+    --signal: #00D97E;
+    --signal-dim: rgba(0,217,126,0.12);
+    --signal-glow: rgba(0,217,126,0.25);
+    --amber: #F59E0B;
+    --amber-dim: rgba(245,158,11,0.12);
+    --danger: #EF4444;
+    --danger-dim: rgba(239,68,68,0.12);
+    --sky: #38BDF8;
+    --sky-dim: rgba(56,189,248,0.1);
+
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'Instrument Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 16px;
+    --r-xl: 24px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .mono { font-family: var(--font-mono); }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--wire-2);
+    color: var(--dim);
+    background: var(--ink-2);
+  }
+  .tag.green { color: var(--signal); border-color: rgba(0,217,126,0.3); background: var(--signal-dim); }
+  .tag.amber { color: var(--amber); border-color: rgba(245,158,11,0.3); background: var(--amber-dim); }
+  .tag.red { color: var(--danger); border-color: rgba(239,68,68,0.3); background: var(--danger-dim); }
+  .tag.sky { color: var(--sky); border-color: rgba(56,189,248,0.3); background: var(--sky-dim); }
+
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; display: inline-block; flex-shrink: 0;
+  }
+  .dot.pulse { animation: pulse-dot 2s ease-in-out infinite; }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .section-label {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--signal); }
+
+  .section-h {
+    font-family: var(--font-display); font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700; line-height: 1.1; letter-spacing: -0.02em;
+    color: var(--white);
+  }
+  .section-sub {
+    font-size: 16px; color: var(--muted); line-height: 1.7;
+    max-width: 520px; margin-top: 14px;
+  }
+
+  .card {
+    background: var(--ink-2);
+    border: 1px solid var(--wire);
+    border-radius: var(--r-lg);
+    padding: 24px;
+  }
+  .card-sm { padding: 16px 20px; border-radius: var(--r-md); }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    background: rgba(10,12,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--wire);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 17px; font-weight: 700;
+    color: var(--white); text-decoration: none;
+  }
+  .nav-logo-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: var(--signal);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-logo-icon svg { width: 16px; height: 16px; }
+  .nav-links {
+    display: flex; align-items: center; gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 9px 20px; border-radius: var(--r-sm);
+    background: var(--signal); color: var(--ink);
+    border: none; cursor: pointer; text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+  @media(max-width:640px) { .nav-links { display: none; } nav { padding: 12px 20px; } }
+
+  #hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 32px 80px;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 500px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,217,126,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1200px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+  }
+  @media(max-width:900px) { .hero-inner { grid-template-columns: 1fr; gap: 40px; } }
+
+  .hero-proto-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--signal); border: 1px solid rgba(0,217,126,0.3);
+    background: var(--signal-dim); padding: 5px 12px; border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .hero-h1 {
+    font-family: var(--font-display); font-size: clamp(38px, 5.5vw, 68px);
+    font-weight: 800; line-height: 1.0; letter-spacing: -0.03em;
+    color: var(--white);
+  }
+  .hero-h1 .accent { color: var(--signal); }
+  .hero-h1 .line2 { color: var(--dim); }
+
+  .hero-sub {
+    font-size: 17px; color: var(--muted); line-height: 1.7;
+    max-width: 480px; margin: 20px 0 36px;
+  }
+
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    padding: 13px 28px; border-radius: var(--r-md);
+    background: var(--signal); color: var(--ink);
+    border: none; cursor: pointer; text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 0 0 0 var(--signal-glow);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 30px var(--signal-glow);
+  }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-display); font-size: 14px; font-weight: 600;
+    padding: 13px 24px; border-radius: var(--r-md);
+    background: transparent; color: var(--white);
+    border: 1px solid var(--wire-2); cursor: pointer; text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--dim); background: var(--ink-2); }
+
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-top: 48px;
+  }
+  .hero-stat {
+    padding: 16px;
+    background: var(--ink-2);
+    border: 1px solid var(--wire);
+    border-radius: var(--r-md);
+  }
+  .hero-stat-num {
+    font-family: var(--font-display); font-size: 28px; font-weight: 800;
+    color: var(--white); line-height: 1;
+  }
+  .hero-stat-num .unit { font-size: 16px; color: var(--signal); }
+  .hero-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .hero-visual { position: relative; }
+  .hero-card-stack {
+    position: relative;
+  }
+  .hero-main-card {
+    background: var(--ink-2);
+    border: 1px solid var(--wire-2);
+    border-radius: var(--r-xl);
+    padding: 24px;
+    position: relative; z-index: 2;
+  }
+  .hero-card-bg {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(135deg, rgba(0,217,126,0.04), transparent);
+    border-radius: var(--r-xl); pointer-events: none;
+  }
+  .hcard-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .hcard-title {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--dim);
+  }
+  .risk-gauge {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0;
+  }
+  .risk-bar-wrap {
+    flex: 1; height: 8px; background: var(--wire);
+    border-radius: 4px; overflow: hidden;
+  }
+  .risk-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--amber), var(--danger));
+    width: 73%;
+    animation: fill-bar 1.5s ease-out forwards;
+  }
+  @keyframes fill-bar { from { width: 0; } to { width: 73%; } }
+  .risk-score {
+    font-family: var(--font-display); font-size: 26px; font-weight: 800;
+    color: var(--danger);
+  }
+  .hcard-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .hcard-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--ink-3); border-radius: var(--r-sm);
+    font-size: 13px;
+  }
+  .hcard-row-label { color: var(--muted); }
+  .hcard-row-val { font-weight: 500; color: var(--white); }
+  .hcard-row-val.green { color: var(--signal); }
+  .hcard-row-val.amber { color: var(--amber); }
+
+  .floating-badge {
+    position: absolute; z-index: 3;
+    background: var(--ink-2); border: 1px solid var(--wire-2);
+    border-radius: var(--r-md); padding: 10px 14px;
+    font-size: 12px; font-family: var(--font-mono);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: float 4s ease-in-out infinite;
+  }
+  .floating-badge.top-right { top: -20px; right: -24px; }
+  .floating-badge.bot-left { bottom: -20px; left: -24px; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @media(max-width:640px) { .floating-badge { display: none; } }
+
+  section {
+    position: relative; z-index: 1;
+    padding: 100px 32px;
+  }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  section:nth-child(even) { background: rgba(26,29,34,0.5); }
+
+  #demo { background: var(--ink-2); border-top: 1px solid var(--wire); border-bottom: 1px solid var(--wire); }
+  .demo-header { text-align: center; margin-bottom: 56px; }
+  .demo-header .section-label { justify-content: center; }
+  .demo-header .section-label::before { display: none; }
+  .demo-header .section-sub { margin: 14px auto 0; }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+  @media(max-width:900px) { .demo-grid { grid-template-columns: 1fr; } }
+
+  .dispatch-card {
+    grid-column: 1; grid-row: 1 / 3;
+  }
+  .driver-card { grid-column: 2; grid-row: 1; }
+  .qr-card { grid-column: 3; grid-row: 1; }
+  .timeline-card { grid-column: 2 / 4; grid-row: 2; }
+  @media(max-width:900px) {
+    .dispatch-card, .driver-card, .qr-card, .timeline-card {
+      grid-column: 1; grid-row: auto;
+    }
+  }
+
+  .card-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .risk-header { margin-bottom: 20px; }
+  .risk-addr { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+  .risk-meta { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+  .risk-score-big {
+    font-family: var(--font-display); font-size: 56px; font-weight: 800;
+    line-height: 1; color: var(--danger); margin: 8px 0 4px;
+  }
+  .risk-score-label { font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 16px; }
+
+  .risk-factors { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .risk-factor {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; background: var(--ink-3); border-radius: var(--r-sm);
+    font-size: 12px;
+  }
+  .risk-factor-name { color: var(--muted); }
+  .risk-factor-bar { flex: 1; margin: 0 12px; height: 4px; background: var(--wire); border-radius: 2px; overflow: hidden; }
+  .risk-factor-fill { height: 100%; border-radius: 2px; }
+
+  .ai-rec {
+    margin-top: 16px; padding: 14px;
+    background: rgba(0,217,126,0.06);
+    border: 1px solid rgba(0,217,126,0.2);
+    border-radius: var(--r-md);
+  }
+  .ai-rec-label { font-family: var(--font-mono); font-size: 10px; color: var(--signal); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .ai-rec-text { font-size: 13px; color: var(--cream); line-height: 1.5; }
+
+  .slot-row {
+    display: flex; gap: 8px; margin-top: 14px;
+  }
+  .slot {
+    flex: 1; padding: 8px; border-radius: var(--r-sm);
+    border: 1px solid var(--wire); text-align: center;
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .slot.best {
+    border-color: rgba(0,217,126,0.4);
+    background: var(--signal-dim); color: var(--signal);
+  }
+  .slot:hover:not(.best) { border-color: var(--wire-2); color: var(--white); }
+
+  .driver-info { margin-bottom: 16px; }
+  .driver-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--white); }
+  .driver-id { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .driver-route-note {
+    padding: 12px; background: var(--ink-3);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 12px; color: var(--cream); line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .driver-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .driver-metric {
+    padding: 10px 12px; background: var(--ink-3); border-radius: var(--r-sm);
+  }
+  .dm-label { font-size: 10px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+  .dm-val { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--white); margin-top: 2px; }
+  .dm-val .dm-unit { font-size: 12px; color: var(--muted); }
+
+  .driver-actions { display: flex; gap: 8px; }
+  .d-btn {
+    flex: 1; padding: 9px; border-radius: var(--r-sm);
+    border: 1px solid var(--wire-2); background: transparent;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--white); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .d-btn:hover { background: var(--ink-3); border-color: var(--dim); }
+  .d-btn.primary { background: var(--signal); border-color: var(--signal); color: var(--ink); }
+  .d-btn.primary:hover { opacity: 0.85; }
+
+  .qr-pass {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--wire-2);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .qr-pass-header {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(0,217,126,0.15), rgba(0,217,126,0.04));
+    border-bottom: 1px solid rgba(0,217,126,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .qr-pass-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--white); }
+  .qr-pass-body { padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+  .qr-code-svg {
+    width: 80px; height: 80px; flex-shrink: 0;
+    background: var(--white); border-radius: 6px;
+    padding: 6px; display: flex; align-items: center; justify-content: center;
+  }
+  .qr-details { flex: 1; }
+  .qr-row { margin-bottom: 8px; }
+  .qr-key { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .qr-val { font-size: 12px; font-weight: 500; color: var(--white); margin-top: 1px; }
+  .qr-pass-footer {
+    padding: 10px 16px;
+    background: var(--ink-3);
+    border-top: 1px solid var(--wire);
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .qr-pass-footer .exp { color: var(--amber); }
+
+  .timeline {
+    display: flex; align-items: flex-start; gap: 0;
+    position: relative;
+  }
+  .tl-item { flex: 1; position: relative; }
+  .tl-connector {
+    position: absolute; top: 14px; left: calc(50% + 18px); right: calc(-50% + 18px);
+    height: 2px;
+  }
+  .tl-connector.done { background: var(--signal); }
+  .tl-connector.pending { background: var(--wire); border-top: 2px dashed var(--wire); background: none; }
+  .tl-dot-wrap { display: flex; justify-content: center; margin-bottom: 8px; }
+  .tl-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; border: 2px solid var(--wire); background: var(--ink-2);
+    color: var(--muted); position: relative; z-index: 2;
+    transition: all 0.3s;
+  }
+  .tl-dot.done { border-color: var(--signal); background: var(--signal-dim); color: var(--signal); }
+  .tl-dot.active { border-color: var(--amber); background: var(--amber-dim); color: var(--amber); }
+  .tl-label { font-family: var(--font-mono); font-size: 10px; text-align: center; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.4; padding: 0 4px; }
+  .tl-label.done { color: var(--signal); }
+  .tl-label.active { color: var(--amber); }
+
+  @media(max-width:500px) { .timeline { gap: 0; } .tl-label { font-size: 8px; } }
+
+  #run-demo-btn {
+    display: block; margin: 32px auto 0;
+    padding: 14px 36px; border-radius: var(--r-md);
+    background: var(--signal); color: var(--ink);
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  #run-demo-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px var(--signal-glow); }
+  #demo-status {
+    text-align: center; margin-top: 14px;
+    font-family: var(--font-mono); font-size: 12px; color: var(--signal);
+    min-height: 18px;
+  }
+
+  .benefits-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 56px; }
+  @media(max-width:700px) { .benefits-grid { grid-template-columns: 1fr; } }
+  .benefit-card {
+    padding: 28px;
+    background: var(--ink-2);
+    border: 1px solid var(--wire);
+    border-radius: var(--r-lg);
+    transition: border-color 0.2s;
+  }
+  .benefit-card:hover { border-color: var(--wire-2); }
+  .benefit-icon {
+    width: 44px; height: 44px; border-radius: var(--r-md);
+    background: var(--signal-dim); border: 1px solid rgba(0,217,126,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 18px;
+  }
+  .benefit-h { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .benefit-p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .benefit-metric { font-family: var(--font-mono); font-size: 13px; color: var(--signal); margin-top: 12px; }
+
+  #architecture { background: var(--ink); }
+  .arch-flow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin-top: 56px; flex-wrap: wrap;
+  }
+  .arch-node {
+    padding: 20px 18px; border-radius: var(--r-lg);
+    background: var(--ink-2); border: 1px solid var(--wire);
+    min-width: 130px; text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .arch-node:hover { border-color: var(--signal); transform: translateY(-3px); }
+  .arch-node-icon { font-size: 26px; margin-bottom: 10px; }
+  .arch-node-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--white); }
+  .arch-node-desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .arch-arrow {
+    width: 40px; height: 2px; background: var(--wire-2); position: relative; flex-shrink: 0;
+  }
+  .arch-arrow::after {
+    content: ''; position: absolute; right: -5px; top: -4px;
+    border: 5px solid transparent; border-left-color: var(--wire-2);
+  }
+  @media(max-width:800px) {
+    .arch-flow { flex-direction: column; }
+    .arch-arrow { width: 2px; height: 32px; }
+    .arch-arrow::after { right: -4px; top: auto; bottom: -5px; border-left-color: transparent; border-top-color: var(--wire-2); }
+  }
+
+  #compare { background: var(--ink-2); border-top: 1px solid var(--wire); border-bottom: 1px solid var(--wire); }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
+  @media(max-width:700px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-col { border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--wire); }
+  .compare-col-header {
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  }
+  .compare-col.before .compare-col-header { background: rgba(239,68,68,0.08); border-bottom: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
+  .compare-col.after .compare-col-header { background: rgba(0,217,126,0.08); border-bottom: 1px solid rgba(0,217,126,0.2); color: var(--signal); }
+  .compare-items { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; background: var(--ink-2); }
+  .compare-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 14px; color: var(--cream); line-height: 1.5;
+  }
+  .compare-item .ci-icon { flex-shrink: 0; margin-top: 2px; font-size: 16px; }
+  .compare-divider {
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 24px; font-weight: 800;
+    color: var(--white);
+  }
+  @media(min-width:701px) { .compare-divider { display: none; } }
+
+  #roadmap { background: var(--ink); }
+  .roadmap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 56px; }
+  @media(max-width:900px) { .roadmap-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width:500px) { .roadmap-grid { grid-template-columns: 1fr; } }
+  .roadmap-card {
+    padding: 22px; border-radius: var(--r-lg);
+    background: var(--ink-2); border: 1px solid var(--wire);
+    position: relative; overflow: hidden;
+  }
+  .roadmap-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .roadmap-card.q1::before { background: var(--signal); }
+  .roadmap-card.q2::before { background: var(--sky); }
+  .roadmap-card.q3::before { background: var(--amber); }
+  .roadmap-card.q4::before { background: #A78BFA; }
+  .roadmap-phase { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+  .roadmap-h { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+  .roadmap-items { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .roadmap-items li { font-size: 12px; color: var(--muted); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+  .roadmap-items li::before { content: '→'; color: var(--signal); flex-shrink: 0; font-family: var(--font-mono); }
+
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--wire);
+    padding: 48px 32px;
+    background: var(--ink);
+    text-align: center;
+  }
+  .footer-logo {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    color: var(--white); margin-bottom: 12px; text-decoration: none;
+  }
+  .footer-tagline { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .footer-proto {
+    display: inline-block; padding: 6px 16px; border-radius: 20px;
+    border: 1px solid var(--wire); font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: var(--wire-2); border-radius: 3px; }
+
+  #console-modal {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(5,7,10,0.85); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  #console-modal.open { display: flex; }
+  .console-inner {
+    background: var(--ink-2); border: 1px solid var(--wire-2);
+    border-radius: var(--r-xl); padding: 32px; max-width: 480px; width: 100%;
+    position: relative;
+  }
+  .console-close {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--wire); border: none; color: var(--dim);
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .console-close:hover { background: var(--wire-2); color: var(--white); }
+  .console-h { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .console-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .console-rows { display: flex; flex-direction: column; gap: 12px; }
+  .console-row {
+    padding: 14px 16px; border-radius: var(--r-md);
+    background: var(--ink-3); border: 1px solid var(--wire);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .cr-icon { font-size: 20px; flex-shrink: 0; }
+  .cr-text { flex: 1; }
+  .cr-label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+  .cr-val { font-size: 14px; color: var(--white); font-weight: 500; margin-top: 2px; }
+  .cr-status { font-family: var(--font-mono); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <span class="nav-logo-icon">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="5" height="5" rx="1" fill="#0A0C0F"/>
+        <rect x="9" y="2" width="5" height="5" rx="1" fill="#0A0C0F"/>
+        <rect x="2" y="9" width="5" height="5" rx="1" fill="#0A0C0F"/>
+        <rect x="10" y="10" width="3" height="3" rx="0.5" fill="#0A0C0F"/>
+      </svg>
+    </span>
+    GatePass AI
+  </a>
+  <ul class="nav-links">
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#why">Benefits</a></li>
+    <li><a href="#architecture">How it works</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+  </ul>
+  <a class="nav-cta" href="#demo">Run Demo →</a>
+</nav>
+
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-proto-badge">
+        <span class="dot pulse" style="color: var(--signal);"></span>
+        Hackathon Prototype · Live Demo
+      </div>
+      <h1 class="hero-h1">
+        Predict the fail.<br>
+        <span class="accent">Clear the gate.</span><br>
+        <span class="line2">Deliver every time.</span>
+      </h1>
+      <p class="hero-sub">
+        GatePass AI helps last-mile dispatch teams identify risky deliveries before vehicles leave, generate verified gate passes for gated communities, and guide drivers to successful completion.
+      </p>
+      <div class="hero-btns">
+        <a class="btn-primary" href="#demo">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polygon points="3,2 11,7 3,12" fill="currentColor"/></svg>
+          Run Demo
+        </a>
+        <button class="btn-secondary" onclick="document.getElementById('console-modal').classList.add('open')">
+          Driver Console ↗
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">28<span class="unit">%</span></div>
+          <div class="hero-stat-label">avg failed delivery rate in India</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">₹180<span class="unit">Cr</span></div>
+          <div class="hero-stat-label">daily cost of failed deliveries</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">4.2<span class="unit">x</span></div>
+          <div class="hero-stat-label">higher failure rate in gated communities</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="hero-main-card">
+          <div class="hero-card-bg"></div>
+          <div class="hcard-header">
+            <span class="hcard-title">Delivery Risk Analysis</span>
+            <span class="tag red"><span class="dot" style="color: var(--danger);"></span> High Risk</span>
+          </div>
+
+          <div style="font-size: 13px; color: var(--muted); margin-bottom: 6px; font-family: var(--font-mono);">ORD-29481 · Prestige Enclave, Gate 3</div>
+          <div class="risk-gauge">
+            <div class="risk-bar-wrap">
+              <div class="risk-bar-fill"></div>
+            </div>
+            <div class="risk-score">73</div>
+          </div>
+
+          <div class="hcard-rows">
+            <div class="hcard-row">
+              <span class="hcard-row-label">Guard verification</span>
+              <span class="hcard-row-val amber">Manual only</span>
+            </div>
+            <div class="hcard-row">
+              <span class="hcard-row-label">Customer availability</span>
+              <span class="hcard-row-val amber">Unconfirmed</span>
+            </div>
+            <div class="hcard-row">
+              <span class="hcard-row-label">Gate pass issued</span>
+              <span class="hcard-row-val green">✓ QR Ready</span>
+            </div>
+            <div class="hcard-row">
+              <span class="hcard-row-label">AI recommendation</span>
+              <span class="hcard-row-val green">Reschedule 4–6 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-badge top-right">
+          <div style="font-size: 10px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 2px;">RISK ENGINE</div>
+          <div style="color: var(--white); font-size: 13px; font-weight: 600;">Running inference <span style="color: var(--signal);">●</span></div>
+        </div>
+        <div class="floating-badge bot-left">
+          <div style="font-size: 10px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 2px;">GATE PASS</div>
+          <div style="color: var(--signal); font-size: 13px; font-weight: 600;">✓ Issued · Exp 6:30 PM</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="demo">
+  <div class="section-inner">
+    <div class="demo-header reveal">
+      <div class="section-label">Live Product Demo</div>
+      <h2 class="section-h">See GatePass AI in action</h2>
+      <p class="section-sub">A complete dispatch scenario — from risky delivery to verified gate entry.</p>
+    </div>
+
+    <div class="demo-grid">
+      <div class="card dispatch-card reveal">
+        <div class="card-label">
+          Dispatch Risk Card
+          <span class="tag red"><span class="dot pulse" style="color:var(--danger)"></span> Live Analysis</span>
+        </div>
+        <div class="risk-header">
+          <div class="risk-addr">Prestige Enclave, Whitefield</div>
+          <div class="risk-meta">ORD-29481 · Scheduled 2:00 PM · 3.2 km</div>
+        </div>
+
+        <div class="risk-score-big" id="riskScoreDisplay">73</div>
+        <div class="risk-score-label">/ 100 RISK SCORE · HIGH PROBABILITY OF FAILURE</div>
+
+        <div class="risk-factors">
+          <div class="risk-factor">
+            <span class="risk-factor-name">Gate restriction</span>
+            <div class="risk-factor-bar"><div class="risk-factor-fill" style="width:85%; background: var(--danger);"></div></div>
+            <span class="tag red" style="padding:2px 6px;font-size:10px;">High</span>
+          </div>
+          <div class="risk-factor">
+            <span class="risk-factor-name">Customer reachability</span>
+            <div class="risk-factor-bar"><div class="risk-factor-fill" style="width:60%; background: var(--amber);"></div></div>
+            <span class="tag amber" style="padding:2px 6px;font-size:10px;">Med</span>
+          </div>
+          <div class="risk-factor">
+            <span class="risk-factor-name">Historical delivery rate</span>
+            <div class="risk-factor-bar"><div class="risk-factor-fill" style="width:42%; background: var(--amber);"></div></div>
+            <span class="tag amber" style="padding:2px 6px;font-size:10px;">Med</span>
+          </div>
+          <div class="risk-factor">
+            <span class="risk-factor-name">Traffic window</span>
+            <div class="risk-factor-bar"><div class="risk-factor-fill" style="width:25%; background: var(--signal);"></div></div>
+            <span class="tag green" style="padding:2px 6px;font-size:10px;">Low</span>
+          </div>
+        </div>
+
+        <div class="ai-rec">
+          <div class="ai-rec-label">⚡ AI Recommendation</div>
+          <div class="ai-rec-text">Customer unreachable at 2 PM window. Reschedule to <strong>4:00–6:00 PM</strong> for 87% success probability. Gate pass pre-issued for guard verification.</div>
+        </div>
+
+        <div style="margin-top:14px; font-family: var(--font-mono); font-size: 11px; color: var(--muted);">Suggested delivery slots</div>
+        <div class="slot-row">
+          <div class="slot">2–4 PM<br><span style="color:var(--danger);font-size:9px;">37% success</span></div>
+          <div class="slot best">4–6 PM ★<br><span style="font-size:9px;">87% success</span></div>
+          <div class="slot">6–8 PM<br><span style="color:var(--muted);font-size:9px;">61% success</span></div>
+        </div>
+      </div>
+
+      <div class="card driver-card reveal reveal-delay-1">
+        <div class="card-label">Driver Console</div>
+        <div class="driver-info">
+          <div class="driver-name">Ramesh K.</div>
+          <div class="driver-id">DRV-4821 · Zone: Whitefield East</div>
+        </div>
+        <div class="driver-route-note">
+          ⚠ Gate 3 only allows verified entry. Show QR to guard. Do NOT ring flat bell before 4 PM — customer is at office.
+        </div>
+        <div class="driver-metrics">
+          <div class="driver-metric">
+            <div class="dm-label">ETA</div>
+            <div class="dm-val">14<span class="dm-unit">min</span></div>
+          </div>
+          <div class="driver-metric">
+            <div class="dm-label">Today</div>
+            <div class="dm-val">8<span class="dm-unit">/11</span></div>
+          </div>
+          <div class="driver-metric">
+            <div class="dm-label">Waiting</div>
+            <div class="dm-val">0<span class="dm-unit">min</span></div>
+          </div>
+          <div class="driver-metric">
+            <div class="dm-label">Rating</div>
+            <div class="dm-val">4.8<span class="dm-unit">★</span></div>
+          </div>
+        </div>
+        <div class="driver-actions">
+          <button class="d-btn" onclick="alert('Calling customer: +91 98765 43210')">📞 Call</button>
+          <button class="d-btn" onclick="alert('SMS sent: ETA 15 min')">💬 SMS</button>
+          <button class="d-btn primary" onclick="document.getElementById('console-modal').classList.add('open')">QR Pass ↗</button>
+        </div>
+      </div>
+
+      <div class="card qr-card reveal reveal-delay-2">
+        <div class="card-label">Digital Gate Pass</div>
+        <div class="qr-pass">
+          <div class="qr-pass-header">
+            <div>
+              <div class="qr-pass-title">GatePass AI</div>
+              <div style="font-size: 11px; color: var(--signal); font-family: var(--font-mono);">VERIFIED ACCESS PASS</div>
+            </div>
+            <span class="tag green"><span class="dot pulse" style="color:var(--signal)"></span> Active</span>
+          </div>
+          <div class="qr-pass-body">
+            <div class="qr-code-svg">
+              <svg viewBox="0 0 68 68" xmlns="http://www.w3.org/2000/svg" width="68" height="68">
+                <rect x="2" y="2" width="18" height="18" fill="#0A0C0F" rx="2"/>
+                <rect x="4" y="4" width="14" height="14" fill="white" rx="1"/>
+                <rect x="6" y="6" width="10" height="10" fill="#0A0C0F" rx="1"/>
+                <rect x="48" y="2" width="18" height="18" fill="#0A0C0F" rx="2"/>
+                <rect x="50" y="4" width="14" height="14" fill="white" rx="1"/>
+                <rect x="52" y="6" width="10" height="10" fill="#0A0C0F" rx="1"/>
+                <rect x="2" y="48" width="18" height="18" fill="#0A0C0F" rx="2"/>
+                <rect x="4" y="50" width="14" height="14" fill="white" rx="1"/>
+                <rect x="6" y="52" width="10" height="10" fill="#0A0C0F" rx="1"/>
+                <rect x="24" y="2" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="30" y="2" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="36" y="2" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="2" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="8" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="36" y="8" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="8" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="14" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="30" y="14" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="14" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="2" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="8" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="14" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="30" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="48" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="60" y="24" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="2" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="14" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="36" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="48" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="54" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="60" y="30" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="8" y="36" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="14" y="36" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="30" y="36" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="36" y="36" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="48" y="36" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="60" y="36" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="42" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="36" y="42" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="42" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="54" y="42" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="2" y="42" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="8" y="42" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="2" y="48" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="48" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="30" y="48" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="48" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="54" y="48" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="60" y="48" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="24" y="54" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="36" y="54" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="48" y="54" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="54" y="54" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="30" y="60" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="42" y="60" width="4" height="4" fill="#0A0C0F"/>
+                <rect x="60" y="60" width="4" height="4" fill="#0A0C0F"/>
+              </svg>
+            </div>
+            <div class="qr-details">
+              <div class="qr-row">
+                <div class="qr-key">Property</div>
+                <div class="qr-val">Prestige Enclave</div>
+              </div>
+              <div class="qr-row">
+                <div class="qr-key">Gate</div>
+                <div class="qr-val">Gate 3 — Delivery</div>
+              </div>
+              <div class="qr-row">
+                <div class="qr-key">Driver</div>
+                <div class="qr-val">Ramesh K. · DRV-4821</div>
+              </div>
+              <div class="qr-row">
+                <div class="qr-key">Parcel</div>
+                <div class="qr-val">ORD-29481 · 2.4 kg</div>
+              </div>
+            </div>
+          </div>
+          <div class="qr-pass-footer">
+            <span>GP-8F3A2C · One-time use</span>
+            <span class="exp">Exp 6:30 PM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card timeline-card reveal reveal-delay-3">
+        <div class="card-label">Scenario Flow — ORD-29481</div>
+        <div class="timeline" id="timeline">
+          <div class="tl-item">
+            <div class="tl-connector done"></div>
+            <div class="tl-dot-wrap"><div class="tl-dot done">✓</div></div>
+            <div class="tl-label done">Order<br>Received</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-connector done"></div>
+            <div class="tl-dot-wrap"><div class="tl-dot done">✓</div></div>
+            <div class="tl-label done">Risk<br>Scored</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-connector done"></div>
+            <div class="tl-dot-wrap"><div class="tl-dot done">✓</div></div>
+            <div class="tl-label done">AI Rec<br>Generated</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-connector done"></div>
+            <div class="tl-dot-wrap"><div class="tl-dot active">⟳</div></div>
+            <div class="tl-label active">Pass<br>Issued</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-connector pending"></div>
+            <div class="tl-dot-wrap"><div class="tl-dot">5</div></div>
+            <div class="tl-label">Driver<br>Dispatched</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot-wrap"><div class="tl-dot">6</div></div>
+            <div class="tl-label">Delivered<br>✓</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <button id="run-demo-btn" onclick="runDemo()">▶ Simulate Delivery Completion</button>
+    <div id="demo-status"></div>
+
+  </div>
+</section>
+
+<section id="why">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Why it matters</div>
+      <h2 class="section-h">Last-mile is broken.<br>We fix the first signal.</h2>
+      <p class="section-sub">Failed deliveries aren't random. They're predictable — if you have the right data, before the van leaves.</p>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card reveal">
+        <div class="benefit-icon">📦</div>
+        <div class="benefit-h">Fewer failed deliveries</div>
+        <div class="benefit-p">Risk scoring at dispatch time catches high-failure deliveries before they waste driver time and fuel. Teams can reschedule intelligently rather than react after the fact.</div>
+        <div class="benefit-metric">→ Target: 35–50% reduction in first-attempt failures</div>
+      </div>
+      <div class="benefit-card reveal reveal-delay-1">
+        <div class="benefit-icon">🔐</div>
+        <div class="benefit-h">Instant gate clearance</div>
+        <div class="benefit-p">QR-based gate passes are verified in seconds by security guards. No more manual logbooks, phone calls to residents, or drivers waiting at the boom gate for 20 minutes.</div>
+        <div class="benefit-metric">→ Target: Gate wait time under 60 seconds</div>
+      </div>
+      <div class="benefit-card reveal reveal-delay-2">
+        <div class="benefit-icon">🚗</div>
+        <div class="benefit-h">Drivers know before they go</div>
+        <div class="benefit-p">Context-aware route notes tell drivers exactly what to expect: which gate to enter, when the customer is available, and whether to hold, proceed, or reschedule.</div>
+        <div class="benefit-metric">→ Driver confidence + delivery success go up together</div>
+      </div>
+      <div class="benefit-card reveal reveal-delay-3">
+        <div class="benefit-icon">⭐</div>
+        <div class="benefit-h">Better customer experience</div>
+        <div class="benefit-p">Customers get deliveries in the window that works for them, not the driver's route order. Fewer missed packages means fewer support tickets and higher NPS for the logistics brand.</div>
+        <div class="benefit-metric">→ Fewer re-attempts = lower cost, higher CSAT</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Product Architecture</div>
+      <h2 class="section-h">From order to delivery —<br>every step is intelligent.</h2>
+      <p class="section-sub">A clean five-stage pipeline: ingest, score, recommend, pass, confirm.</p>
+    </div>
+    <div class="arch-flow reveal">
+      <div class="arch-node">
+        <div class="arch-node-icon">📋</div>
+        <div class="arch-node-name">Order Input</div>
+        <div class="arch-node-desc">Address, parcel details, delivery window</div>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-node-icon">🧠</div>
+        <div class="arch-node-name">Risk Engine</div>
+        <div class="arch-node-desc">ML scoring: gate, customer, history, traffic</div>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-node-icon">⚡</div>
+        <div class="arch-node-name">AI Recommendation</div>
+        <div class="arch-node-desc">Time slot, driver note, action flag</div>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-node-icon">🔑</div>
+        <div class="arch-node-name">Gate Pass</div>
+        <div class="arch-node-desc">QR issued, expiry set, guard notified</div>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-node-icon">✅</div>
+        <div class="arch-node-name">Confirmed</div>
+        <div class="arch-node-desc">Delivery POD, gate log, score update</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Before vs After</div>
+      <h2 class="section-h">This is what the old<br>workflow looks like.</h2>
+    </div>
+    <div class="compare-grid reveal">
+      <div class="compare-col before">
+        <div class="compare-col-header">
+          <span>✗</span> Without GatePass AI
+        </div>
+        <div class="compare-items">
+          <div class="compare-item"><span class="ci-icon">❌</span> Driver arrives at gate with no pass. Guard calls resident. Wait 15–25 min.</div>
+          <div class="compare-item"><span class="ci-icon">❌</span> Customer unreachable. Driver marks failed. Return trip next day.</div>
+          <div class="compare-item"><span class="ci-icon">❌</span> Dispatch team doesn't know it failed until end-of-day report.</div>
+          <div class="compare-item"><span class="ci-icon">❌</span> No historical data on gated community access patterns.</div>
+          <div class="compare-item"><span class="ci-icon">❌</span> Driver frustration. High churn. Repeat failures at same addresses.</div>
+        </div>
+      </div>
+      <div class="compare-col after">
+        <div class="compare-col-header">
+          <span>✓</span> With GatePass AI
+        </div>
+        <div class="compare-items">
+          <div class="compare-item"><span class="ci-icon">✅</span> Risk flagged at dispatch. Delivery rescheduled before vehicle leaves.</div>
+          <div class="compare-item"><span class="ci-icon">✅</span> QR gate pass pre-issued. Guard scans, driver enters in under 60 seconds.</div>
+          <div class="compare-item"><span class="ci-icon">✅</span> AI route note tells driver exactly which gate, time, and customer status.</div>
+          <div class="compare-item"><span class="ci-icon">✅</span> Every outcome feeds back into the risk model — it gets smarter each run.</div>
+          <div class="compare-item"><span class="ci-icon">✅</span> Dispatch team has real-time visibility. Fewer calls. Fewer surprises.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">What's next</div>
+      <h2 class="section-h">Prototype today.<br>Platform tomorrow.</h2>
+      <p class="section-sub">GatePass AI is a working hackathon prototype. Here's the path to production.</p>
+    </div>
+    <div class="roadmap-grid reveal">
+      <div class="roadmap-card q1">
+        <div class="roadmap-phase">Now · Prototype</div>
+        <div class="roadmap-h">Core intelligence</div>
+        <ul class="roadmap-items">
+          <li>Risk scoring engine (rule-based + ML)</li>
+          <li>QR gate pass generation</li>
+          <li>AI slot recommendation</li>
+          <li>Driver console UI</li>
+          <li>Dispatch risk dashboard</li>
+        </ul>
+      </div>
+      <div class="roadmap-card q2">
+        <div class="roadmap-phase">Phase 2 · MVP</div>
+        <div class="roadmap-h">Live integrations</div>
+        <ul class="roadmap-items">
+          <li>Shiprocket / Delhivery API</li>
+          <li>WhatsApp delivery alerts</li>
+          <li>Google Maps ETA sync</li>
+          <li>Guard-side QR scanner app</li>
+          <li>Customer self-scheduling</li>
+        </ul>
+      </div>
+      <div class="roadmap-card q3">
+        <div class="roadmap-phase">Phase 3 · Scale</div>
+        <div class="roadmap-h">Analytics & security</div>
+        <ul class="roadmap-items">
+          <li>Community security dashboards</li>
+          <li>Delivery analytics reports</li>
+          <li>Driver performance scoring</li>
+          <li>Fraud detection on gate passes</li>
+          <li>Multi-property management</li>
+        </ul>
+      </div>
+      <div class="roadmap-card q4">
+        <div class="roadmap-phase">Phase 4 · Platform</div>
+        <div class="roadmap-h">Ecosystem</div>
+        <ul class="roadmap-items">
+          <li>Driver mobile app (Android)</li>
+          <li>Resident delivery preferences</li>
+          <li>Society management integration</li>
+          <li>National gated-community registry</li>
+          <li>SaaS B2B pricing model</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a class="footer-logo" href="#">
+    <span class="nav-logo-icon" style="background:var(--signal);">
+      <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+        <rect x="2" y="2" width="5" height="5" rx="1" fill="#0A0C0F"/>
+        <rect x="9" y="2" width="5" height="5" rx="1" fill="#0A0C0F"/>
+        <rect x="2" y="9" width="5" height="5" rx="1" fill="#0A0C0F"/>
+        <rect x="10" y="10" width="3" height="3" rx="0.5" fill="#0A0C0F"/>
+      </svg>
+    </span>
+    GatePass AI
+  </a>
+  <div class="footer-tagline">Delivery intelligence for the last mile. Built for dispatch teams, designed for scale.</div>
+  <div class="footer-proto">⚡ Hackathon Prototype · Not yet in production</div>
+</footer>
+
+<div id="console-modal">
+  <div class="console-inner">
+    <button class="console-close" onclick="document.getElementById('console-modal').classList.remove('open')">✕</button>
+    <div class="console-h">Driver Console</div>
+    <div class="console-sub">Active delivery: ORD-29481 · Ramesh K. · DRV-4821</div>
+    <div class="console-rows">
+      <div class="console-row">
+        <span class="cr-icon">🗺</span>
+        <div class="cr-text">
+          <div class="cr-label">Current location</div>
+          <div class="cr-val">Marathahalli, 3.2 km from delivery</div>
+        </div>
+        <span class="tag green" style="flex-shrink:0">En route</span>
+      </div>
+      <div class="console-row">
+        <span class="cr-icon">⏱</span>
+        <div class="cr-text">
+          <div class="cr-label">Estimated arrival</div>
+          <div class="cr-val">4:12 PM · 14 min</div>
+        </div>
+      </div>
+      <div class="console-row">
+        <span class="cr-icon">🔐</span>
+        <div class="cr-text">
+          <div class="cr-label">Gate pass status</div>
+          <div class="cr-val">GP-8F3A2C · Ready to scan</div>
+        </div>
+        <span class="tag green" style="flex-shrink:0"><span class="dot pulse" style="color:var(--signal)"></span> Active</span>
+      </div>
+      <div class="console-row">
+        <span class="cr-icon">📋</span>
+        <div class="cr-text">
+          <div class="cr-label">AI route note</div>
+          <div class="cr-val">Use Gate 3. Customer available after 4 PM. QR to guard first.</div>
+        </div>
+      </div>
+      <div class="console-row">
+        <span class="cr-icon">👤</span>
+        <div class="cr-text">
+          <div class="cr-label">Customer</div>
+          <div class="cr-val">Aravind M. · +91 98765 43210 · Flat 4B</div>
+        </div>
+        <button class="d-btn primary" style="flex-shrink:0; width:56px; padding:6px;" onclick="alert('Calling: +91 98765 43210')">📞</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+
+  const steps = [
+    { msg: '⬡ Fetching delivery data...', delay: 500 },
+    { msg: '⬡ Running risk engine on ORD-29481...', delay: 900 },
+    { msg: '⬡ Gate restriction: HIGH · Customer: UNCONFIRMED', delay: 1400 },
+    { msg: '⬡ AI recommendation: reschedule to 4–6 PM window', delay: 2000 },
+    { msg: '⬡ Gate pass updated → Valid until 6:30 PM', delay: 2700 },
+    { msg: '⬡ Driver Ramesh K. dispatched at 4:00 PM', delay: 3500 },
+    { msg: '⬡ QR scanned at Gate 3 → Entry granted in 38 sec', delay: 4400 },
+    { msg: '✓ Delivery confirmed · POD captured · Score updated', delay: 5200 }
+  ];
+
+  let demoRunning = false;
+
+  function runDemo() {
+    if (demoRunning) return;
+    demoRunning = true;
+    const btn = document.getElementById('run-demo-btn');
+    const status = document.getElementById('demo-status');
+    btn.disabled = true;
+    btn.textContent = '⟳ Simulating...';
+
+    const tl = document.getElementById('timeline');
+    const dots = tl.querySelectorAll('.tl-dot');
+    const labels = tl.querySelectorAll('.tl-label');
+    const connectors = tl.querySelectorAll('.tl-connector');
+    dots.forEach((d,i) => {
+      d.className = 'tl-dot';
+      d.textContent = i + 1;
+    });
+    labels.forEach(l => { l.className = 'tl-label'; });
+
+    let step = 0;
+    function tick() {
+      if (step >= steps.length) {
+        status.textContent = '✓ Delivery complete. 100% success. Gate log saved.';
+        status.style.color = 'var(--signal)';
+        btn.disabled = false;
+        btn.textContent = '▶ Run Again';
+        demoRunning = false;
+
+        dots.forEach(d => { d.className = 'tl-dot done'; d.textContent = '✓'; });
+        labels.forEach(l => { l.className = 'tl-label done'; });
+        connectors.forEach(c => { c.className = 'tl-connector done'; });
+        return;
+      }
+      const s = steps[step];
+      status.textContent = s.msg;
+      status.style.color = 'var(--sky)';
+
+      const tlStep = Math.floor(step / 1.4);
+      if (tlStep < dots.length) {
+        dots[tlStep].className = 'tl-dot active';
+        dots[tlStep].textContent = '⟳';
+        labels[tlStep].className = 'tl-label active';
+        if (tlStep > 0) {
+          dots[tlStep - 1].className = 'tl-dot done';
+          dots[tlStep - 1].textContent = '✓';
+          labels[tlStep - 1].className = 'tl-label done';
+          if (connectors[tlStep - 1]) connectors[tlStep - 1].className = 'tl-connector done';
+        }
+      }
+
+      step++;
+      if (step < steps.length) {
+        setTimeout(tick, steps[step].delay - steps[step-1].delay);
+      } else {
+        setTimeout(tick, 900);
+      }
+    }
+    setTimeout(tick, steps[0].delay);
+  }
+
+  document.getElementById('console-modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+</script>
+</body>
+</html>
